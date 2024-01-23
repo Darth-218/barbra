@@ -1,37 +1,52 @@
 #!barb/bin/python3.11
+from pathlib import Path
 import os
+import movef
 
+mf = movef.change()
 
 class readfolder:
 
-    def __init__(self, default, audio, video, doc) -> None:
+    def __init__(self) -> None:
 
-        self.default, self.audio, self.video, self.doc = default, audio, video, doc
-        self.defs = [self.default, self.audio, self.video, self.doc]
+        try:
 
-    def conf(self) -> None:
+            with open("shelf.txt", "r") as settings:
 
-        if not os.path.isfile("shelf.txt"):
+                    self.paths = settings.readlines()
 
-            with open("shelf.txt", "w") as settings:
+        except:
 
-                settings.writelines(self.defs)
+            mf.freshconfig()
+
+        self.default = self.paths[0].strip()
+        self.audio = self.paths[1].strip()
+        self.video = self.paths[2].strip()
+        self.docs = self.paths[3].strip()
+        self.other = self.paths[4].strip()
 
     def checkifdir(self, dirpath: str) -> bool:
 
-        return os.path.isdir(dirpath)
+        return Path(dirpath).is_dir()
 
     def prepfiles(self) -> None:
 
-        for x in self.default:
+        for x in os.listdir(self.default):
 
             match x.split(".")[-1]:
 
-                case ".mp3" | ".wav":
+                case "mp3" | "wav":
 
-                    print("This is audio and goes in:", self.audio)
+                    print(x, "is an audio and goes in:", self.audio)
 
+                case "mp4":
 
-if __name__ == "__main__":
+                    print(x, "is a video and goes in:", self.video)
 
-    pass
+                case "pdf" | "docx":
+
+                    print(x, "is a document and goes in:", self.docs)
+
+                case _:
+
+                    print(x, "is something and goes in:", self.other)

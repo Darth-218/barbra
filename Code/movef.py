@@ -1,22 +1,35 @@
 #!barb/bin/python3.11
-import os
 import shutil
 
+import Code
+
+rf = Code.readext.readfolder()
 
 class change:
 
+    def createdefs(self) -> None:
+
+        with open("shelf.txt", "r") as settings:
+
+            if len(settings.readlines()) != 5:
+
+                self.freshconfig()
+
+    def freshconfig(self) -> None:
+
+        with open("shelf.txt", "w") as settings:
+
+            settings.writelines(["0\n", "0\n", "0\n", "0\n", "0\n"])
+
     def checkdefs(self) -> None:
+
+        if input("Create a new config? [y/n] ") == "y":
+
+            self.freshconfig()
 
         try:
 
-            with open("shelf.txt", "r") as settings:
-
-                if not len(settings.readlines()):
-
-                    with open("shelf.txt", "w") as settings:
-
-                        settings.writelines(["0\n", "0\n", "0\n", "0\n"])
-
+            self.createdefs()
             self.writedefs()
 
         except:
@@ -31,7 +44,7 @@ class change:
 
         with open("shelf.txt", "r") as settings:
 
-            paths_ = ["Default", "Audio", "Video", "Documents"]
+            paths_ = ["Default", "Audio", "Video", "Documents", "Others"]
 
             editted_ = settings.readlines()
 
@@ -39,7 +52,21 @@ class change:
 
                 if editted_[x].strip() == "0":
 
-                    editted_[x] = input(f"Add a path for {paths_[x]}: ") + "\n"
+                    temp = input(f"Add a path for {paths_[x]}: ")
+
+                    if rf.checkifdir(temp):
+
+                        editted_[x] = temp + "\n"
+
+                    elif temp == "q":
+
+                        quit()
+
+                    else:
+
+                        print(temp, "is not a valid path")
+
+                        self.writedefs()
 
             print("Those are the new paths", editted_)
 
