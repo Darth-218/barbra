@@ -1,6 +1,8 @@
 from pathlib import Path
 from yaml import safe_load
 from shutil import move
+from sys import argv
+from getopt import getopt
 
 def getContent(path: Path) -> tuple[list[str], list[str]]:
     entries = ([], [])
@@ -22,13 +24,30 @@ def moveFiles(entries: tuple, dest: dict) -> None:
 
 
 def readConfig(config: Path) -> dict:
-    with open(config, 'r') as config_file:
-        return safe_load(config_file)
+    try:
+        with open(config, 'r') as config_file:
+            return safe_load(config_file)
+    except FileNotFoundError:
+        print("\nConfiguration file not found.\n")
+        quit(1)
 
 
-if __name__ == '__main__':
-    config_path = Path('./config.yaml')
+def getConfig(opts) -> Path:
+    config_path = './config.yaml'
+    for opt, arg in opts:
+        if opt in ("c", "--config"):
+            config_path = Path(arg)
+    return Path(config_path)
+
+
+def main() -> None:
+    opts, args = getopt(argv[1:], "c:", ["config"])
+    config_path = getConfig(opts)
     config = readConfig(config_path)
     content = getContent(Path(config['source']))
     moveFiles(content, config)
     print("Files moved!")
+
+
+if __name__ == '__main__':
+    main()
