@@ -13,6 +13,8 @@ def getContent(path: Path) -> tuple[list[str], list[str]]:
 
 
 def moveFiles(entries: tuple, dest: dict) -> None:
+    if entries == ([], []):
+        return
     file: Path
     for file in entries[0]:
         try:
@@ -21,6 +23,7 @@ def moveFiles(entries: tuple, dest: dict) -> None:
             move(file, dest['other'])
     for directory in entries[1]:
         move(directory, dest['directory'])
+    print("Files moved!")
 
 
 def readConfig(config: Path) -> dict:
@@ -33,20 +36,23 @@ def readConfig(config: Path) -> dict:
 
 
 def getConfig(opts) -> Path:
-    config_path = './config.yaml'
+    config_path = Path('./config.yaml')
     for opt, arg in opts:
-        if opt in ("c", "--config"):
+        if opt in ("-c", "--config"):
             config_path = Path(arg)
-    return Path(config_path)
+    if not config_path.exists():
+        print("Configuration file not found.") 
+        quit(1)
+    return config_path
 
 
 def main() -> None:
-    opts, args = getopt(argv[1:], "c:", ["config"])
+    opts, _ = getopt(argv[1:], "c:", ["config"])
     config_path = getConfig(opts)
     config = readConfig(config_path)
     content = getContent(Path(config['source']))
     moveFiles(content, config)
-    print("Files moved!")
+    print("Exiting...")
 
 
 if __name__ == '__main__':
