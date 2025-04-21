@@ -1,3 +1,5 @@
+#!/bin/python3
+
 from pathlib import Path
 from yaml import safe_load
 from shutil import move
